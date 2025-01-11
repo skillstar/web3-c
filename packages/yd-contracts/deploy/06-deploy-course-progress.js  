@@ -1,0 +1,62 @@
+const { network } = require("hardhat")  
+const { developmentChains, networkConfig, CONFIRMATIONS } = require("../helper-hardhat-config")  
+
+module.exports = async ({ getNamedAccounts, deployments }) => {  
+    const { deploy, get, log } = deployments  
+    const { firstAccount } = await getNamedAccounts()  
+
+    log("----------------------------------------------------")  
+    log(`当前网络: ${network.name}`)  
+    log(`部署账户: ${firstAccount}`)  
+    log(`网络 Chain ID: ${network.config.chainId}`)  
+
+    let aggregatorAddress, nftAddress  
+
+    if (developmentChains.includes(network.name)) {  
+        const mockAggregator = await get("MockAggregator")  
+        const mockNft = await get("MockCourseNFT")  
+        aggregatorAddress = mockAggregator.address  
+        nftAddress = mockNft.address  
+        log("使用 Mock 合约地址")  
+    } else {  
+        aggregatorAddress = networkConfig[network.config.chainId].aggregatorAddress  
+        nftAddress = networkConfig[network.config.chainId].nftAddress  
+        log("使用实际合约地址")  
+    }  
+
+    const courseProgress = await deploy("CourseProgress", {  
+        from: firstAccount,  
+        args: [aggregatorAddress, nftAddress],  
+        log: true,  
+        waitConfirmations: network.name === "hardhat" ? 1 : CONFIRMATIONS,  
+    })  
+
+    log(`CourseProgress 合约部署成功`)  
+    log(`合约地址: ${courseProgress.address}`)  
+
+    // Sepolia 网络验证  
+    if (network.config.chainId == 11155111 && process.env.ETHERSCAN_API_KEY) {  
+        log("正在验证合约...")  
+        try {  
+            await hre.run("verify:verify", {  
+                address: courseProgress.address,  
+                constructorArguments: [aggregatorAddress, nftAddress],  
+            })  
+            log("合约验证成功!")  
+        } catch (error) {  
+            log(`合约验证失败: ${error.message}`)  
+            log(error.stack)  
+        }  
+    } else {  
+        log(`网络 ${network.name} 不支持验证，跳过...`)  
+    }  
+
+    log("\n部署摘要:")  
+    log(`CourseProgress 地址: ${courseProgress.address}`)  
+    log(`Aggregator 地址: ${aggregatorAddress}`)  
+    log(`NFT 地址: ${nftAddress}`)  
+    log(`部署账户: ${firstAccount}`)  
+    log("----------------------------------------------------")  
+}  
+
+module.exports.tags = ["all", "course-progress"] 

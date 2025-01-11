@@ -1,0 +1,12 @@
+{
+  "name": "web3-launchpad",
+  "version": "1.0.0",
+  "description": "专注于培养Web3人才的教育平台",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

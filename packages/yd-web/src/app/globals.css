@@ -1,0 +1,220 @@
+:root {
+  background-color: #181818;
+  color: rgba(255, 255, 255, 0.87);
+  color-scheme: light dark;
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-synthesis: none;
+  font-weight: 400;
+  line-height: 1.5;
+  text-rendering: optimizeLegibility;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    background-color: #000000;
+    color: #181818;
+  }
+}
+/* 隐藏数字输入框的上下箭头 */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none; /* Chrome, Safari, Edge */
+  margin: 0; /* 取消默认边距 */
+}
+
+input[type="number"] {
+  -moz-appearance: textfield; /* Firefox */
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --radius: 0.5rem;
+  }
+  .custom-text-6xl {
+    font-size: 4rem; /* 你可以根据需要调整大小 */
+  }
+}
+
+@layer utilities {
+  .flex-between {
+    @apply flex justify-between items-center;
+  }
+
+  .text-16-medium {
+    @apply font-medium text-[16px] text-black;
+  }
+
+  .text-26-semibold {
+    @apply font-semibold text-[26px] text-black;
+  }
+
+  /* courseCard 特定样式 */
+  .course-card {
+    @apply bg-white border-[5px] border-black py-6 px-5 rounded-[22px] shadow-lg hover:border-primary transition-all duration-500 hover:shadow-xl hover:bg-primary-light/10;
+  }
+
+  .course-card_date {
+    @apply font-medium text-[16px] bg-primary-light/10 px-4 py-2 rounded-full group-hover:bg-white/10 group-hover:text-primary/70 transition-colors;
+  }
+
+  .course-card_desc {
+    @apply font-normal text-[16px] line-clamp-2 my-3 text-dark-lighter break-all group-hover:text-primary/60 transition-colors;
+  }
+
+  .course-card_img {
+    @apply w-full h-[164px] rounded-[10px] object-cover;
+  }
+
+  .course-card_btn {
+    @apply rounded-full bg-dark-light font-medium text-[16px] text-white px-5 py-3 hover:bg-primary hover:text-[#04060c] transition-colors;
+  }
+
+  .course-card_skeleton {
+    @apply w-full h-96 rounded-[22px] bg-dark-lighter;
+  }
+
+  .card_grid {
+    @apply grid md:grid-cols-3 sm:grid-cols-2 gap-5;
+  }
+
+  .card_grid-sm {
+    @apply grid sm:grid-cols-2 gap-5;
+  }
+}
+
+@layer components {
+  .animate-confetti {
+    position: relative;
+  }
+
+  .animate-confetti::before,
+  .animate-confetti::after {
+    content: "";
+    position: absolute;
+    display: block;
+    width: 140%;
+    height: 100%;
+    left: -20%;
+    z-index: -1;
+    transition: all ease-in-out var(--animation-duration);
+    background-repeat: no-repeat;
+  }
+
+  .animate-confetti::before {
+    content: attr(data-confetti-text);
+    display: block;
+    top: -75%;
+    text-align: center;
+    width: 100%;
+    left: 0;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    transform: rotate(-3deg);
+    color: var(--text-color);
+    animation: topBubbles var(--animation-duration) ease-in-out forwards;
+    background-image: radial-gradient(
+        circle,
+        var(--confetti-color) 20%,
+        transparent 20%
+      ),
+      radial-gradient(
+        circle,
+        transparent 20%,
+        var(--confetti-color) 20%,
+        transparent 30%
+      ),
+      radial-gradient(circle, var(--confetti-color) 20%, transparent 20%),
+      radial-gradient(circle, var(--confetti-color) 20%, transparent 20%),
+      radial-gradient(
+        circle,
+        transparent 10%,
+        var(--confetti-color) 15%,
+        transparent 20%
+      ),
+      radial-gradient(circle, var(--confetti-color) 20%, transparent 20%),
+      radial-gradient(circle, var(--confetti-color) 20%, transparent 20%),
+      radial-gradient(circle, var(--confetti-color) 20%, transparent 20%),
+      radial-gradient(circle, var(--confetti-color) 20%, transparent 20%);
+    background-size:
+      10% 10%,
+      20% 20%,
+      15% 15%,
+      20% 20%,
+      18% 18%,
+      10% 10%,
+      15% 15%,
+      10% 10%,
+      18% 18%;
+    background-position:
+      5% 90%,
+      10% 90%,
+      10% 90%,
+      15% 90%,
+      25% 90%,
+      25% 90%,
+      40% 90%,
+      55% 90%,
+      70% 90%;
+  }
+
+  .animate-confetti::after {
+    content: "";
+    display: block;
+    bottom: -75%;
+    animation: bottomBubbles var(--animation-duration) ease-in-out forwards;
+    background-image: radial-gradient(
+        circle,
+        var(--confetti-color) 20%,
+        transparent 20%
+      ),
+      radial-gradient(circle, var(--confetti-color) 20%, transparent 20%),
+      radial-gradient(
+        circle,
+        transparent 10%,
+        var(--confetti-color) 15%,
+        transparent 20%
+      ),
+      radial-gradient(circle, var(--confetti-color) 20%, transparent 20%),
+      radial-gradient(circle, var(--confetti-color) 20%, transparent 20%),
+      radial-gradient(circle, var(--confetti-color) 20%, transparent 20%),
+      radial-gradient(circle, var(--confetti-color) 20%, transparent 20%);
+    background-size:
+      15% 15%,
+      20% 20%,
+      18% 18%,
+      20% 20%,
+      15% 15%,
+      10% 10%,
+      20% 20%;
+    background-position:
+      10% -10%,
+      30% 10%,
+      55% -10%,
+      70% -10%,
+      85% -10%,
+      70% -10%,
+      70% 0%;
+  }
+
+  @keyframes move-right {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(5px); /* 你可以根据需要调整移动的距离 */
+    }
+  }
+
+  .animate-move-right {
+    animation: move-right 1s linear infinite alternate; /* 1秒内完成一次移动，线性，循环 */
+  }
+}

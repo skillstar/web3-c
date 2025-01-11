@@ -1,0 +1,48 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol": {
+      "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\n// solhint-disable-next-line interface-starts-with-i\ninterface AggregatorV3Interface {\n  function decimals() external view returns (uint8);\n\n  function description() external view returns (string memory);\n\n  function version() external view returns (uint256);\n\n  function getRoundData(\n    uint80 _roundId\n  ) external view returns (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound);\n\n  function latestRoundData()\n    external\n    view\n    returns (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound);\n}\n"
+    },
+    "contracts/CourseProgress.sol": {
+      "content": "// SPDX-License-Identifier: MIT  \npragma solidity ^0.8.20;  \n\nimport \"@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol\";  \n\n/**  \n * @dev 你的NFT合约接口，只需包含要调用的函数签名即可  \n *      这里对应CourseNFT的safeMint(address,string)  \n */  \ninterface ICourseNFT {  \n    function safeMint(address to, string memory tokenURI_) external;  \n}  \n\ncontract CourseProgress {  \n    AggregatorV3Interface public aggregator;   // Chainlink Aggregator  \n    ICourseNFT public courseNft;              // 你的NFT合约  \n    address public owner;  \n\n    // 记录所有 courseId 对应的 IPFS CID  \n    mapping(uint256 => string) private courseCIDs;  \n\n    event ProgressChecked(int256 progress, address indexed user, uint256 courseId);  \n    event NftMinted(address indexed user, uint256 courseId, string tokenURI);  \n\n    constructor(address aggregatorAddress, address nftContractAddress) {  \n        aggregator = AggregatorV3Interface(aggregatorAddress);  \n        courseNft = ICourseNFT(nftContractAddress);  \n        owner = msg.sender;  \n    }  \n\n    modifier onlyOwner() {  \n        require(msg.sender == owner, \"Not owner\");  \n        _;  \n    }  \n\n    /**  \n     * @dev 设置指定 courseId 对应的 IPFS CID  \n     *      例如: courseId=1 -> \"QmABC...\"  \n     */  \n    function setCourseCID(uint256 courseId, string calldata cid) external onlyOwner {  \n        courseCIDs[courseId] = cid;  \n    }  \n\n    /**  \n     * @dev 读取 aggregator 最新进度，当进度≥100时自动给 user 铸造  \n     *      对应 courseId 的 NFT(其 tokenURI = \"ipfs://<cid>\")  \n     */  \n    function checkAndMint(address user, uint256 courseId) external onlyOwner {  \n        // 读取Aggregator中的进度  \n        ( , int256 answer, , , ) = aggregator.latestRoundData();  \n\n        emit ProgressChecked(answer, user, courseId);  \n\n        // 检查进度  \n        if (answer >= 100) {  \n            // 找到事先登记好的CID  \n            string memory cid = courseCIDs[courseId];  \n            require(bytes(cid).length > 0, \"CID not set for this courseId\");  \n\n            // 拼接成完整的 ipfs://URI  \n            string memory tokenURI_ = string(abi.encodePacked(\"ipfs://\", cid));  \n\n            // 铸造NFT  \n            courseNft.safeMint(user, tokenURI_);  \n            emit NftMinted(user, courseId, tokenURI_);  \n        }  \n    }  \n}"
+    },
+    "contracts/CourseProgressAggregator.sol": {
+      "content": "// SPDX-License-Identifier: MIT  \npragma solidity ^0.8.20;  \n\nimport \"@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol\";  \n\n/**\n * @title CourseProgressAggregator\n * @notice 自定义“课程进度聚合器”合约。模拟Chainlink Aggregator，可被外部(前端/节点)调用以写入进度值。\n *         其他合约(例如 MyOracle.sol)通过latestRoundData()来读取当前进度.\n */\ncontract CourseProgressAggregator is AggregatorV3Interface {\n    // 当前进度(0~100)\n    int256 private _currentProgress;\n\n    // (可选) 可设置合约所有者权限\n    address public owner;\n\n    constructor() {\n        owner = msg.sender;\n    }\n\n    modifier onlyOwner() {\n        require(msg.sender == owner, \"Not owner\");\n        _;\n    }\n\n    /**\n     * @dev 设置新的进度值(0~100)。外部合约或前端可直接调用.\n     */\n    function setProgress(int256 newProgress) external onlyOwner {\n        // 可做一些校验 newProgress 在 [0,100] 范围内\n        require(newProgress >= 0 && newProgress <= 100, \"Invalid progress\");\n        _currentProgress = newProgress;\n    }\n\n    /**\n     * @notice Chainlink Aggregator 标准接口：返回最新一轮数据\n     *         这里仅返回 _currentProgress，其他字段都用0代替\n     */\n    function latestRoundData()\n        external\n        view\n        override\n        returns (\n            uint80 roundId,\n            int256 answer,\n            uint256 startedAt,\n            uint256 updatedAt,\n            uint80 answeredInRound\n        )\n    {\n        return (\n            0,\n            _currentProgress,\n            0,\n            0,\n            0\n        );\n    }\n\n    // 下面几个函数是Chainlink Aggregator接口必须的\n    function decimals() external pure override returns (uint8) { return 0; }\n    function description() external pure override returns (string memory) { return \"Custom course progress aggregator\"; }\n    function version() external pure override returns (uint256) { return 1; }\n    function getRoundData(uint80)\n        external\n        pure\n        override\n        returns (\n            uint80 roundId,\n            int256 answer,\n            uint256 startedAt,\n            uint256 updatedAt,\n            uint80 answeredInRound\n        )\n    {\n        revert(\"Not implemented\");\n    }\n}"
+    },
+    "contracts/MockAggregator.sol": {
+      "content": "// SPDX-License-Identifier: MIT  \npragma solidity ^0.8.20;  \n\nimport \"@chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol\";  \n\n\n\ncontract MockAggregator is AggregatorV3Interface {  \n    int256 private _answer;  \n\n    function latestRoundData()  \n        external  \n        view  \n        override  \n        returns (  \n            uint80 roundId,  \n            int256 answer,  \n            uint256 startedAt,  \n            uint256 updatedAt,  \n            uint80 answeredInRound  \n        )  \n    {  \n        return (0, _answer, 0, 0, 0);  \n    }  \n\n    function setAnswer(int256 newAnswer) external {  \n        _answer = newAnswer;  \n    }  \n\n    // 以下仅为满足接口编译  \n    function decimals() external pure override returns (uint8) { return 0; }  \n    function description() external pure override returns (string memory) { return \"Mock\"; }  \n    function version() external pure override returns (uint256) { return 1; }  \n    function getRoundData(uint80)  \n        external  \n        pure  \n        override  \n        returns (  \n            uint80,  \n            int256,  \n            uint256,  \n            uint256,  \n            uint80  \n        )  \n    {  \n        revert(\"Not implemented\");  \n    }  \n}"
+    },
+    "contracts/MockCourseNFT.sol": {
+      "content": "// SPDX-License-Identifier: MIT  \npragma solidity ^0.8.20;  \n\ninterface IMockCourseNFT {  \n    function safeMint(address to, string memory tokenURI_) external;  \n}  \n\ncontract MockCourseNFT {  \n    // 记录一下铸造的数量、铸造情况，用于测试断言  \n    uint256 public totalMinted;  \n    mapping(uint256 => address) public owners;  \n    mapping(uint256 => string) public tokenURIs;  \n\n    // 简化：每次safeMint就让tokenId = totalMinted+1  \n    function safeMint(address to, string memory tokenURI_) external {  \n        totalMinted += 1;  \n        owners[totalMinted] = to;  \n        tokenURIs[totalMinted] = tokenURI_;  \n    }  \n}"
+    }
+  },
+  "settings": {
+    "evmVersion": "paris",
+    "optimizer": {
+      "enabled": false,
+      "runs": 200
+    },
+    "outputSelection": {
+      "*": {
+        "*": [
+          "abi",
+          "evm.bytecode",
+          "evm.deployedBytecode",
+          "evm.methodIdentifiers",
+          "metadata",
+          "devdoc",
+          "userdoc",
+          "storageLayout",
+          "evm.gasEstimates"
+        ],
+        "": [
+          "ast"
+        ]
+      }
+    },
+    "metadata": {
+      "useLiteralContent": true
+    }
+  }
+}
