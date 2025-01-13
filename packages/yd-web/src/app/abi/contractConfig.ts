@@ -8,7 +8,7 @@ export const YDTOKEN_CONTRACT = {
 } as const;
 
 export const YDCOURSE_CONTRACT = {
-    address: "0xC277bcbDEa84180b8d14a5bE1cDF43c42D425187",
+    address: "0xBa91cd76B3FAb4488f6A723a3Ef2e17F15fb0141",
     abi: YdCourseABI.abi
 } as const;
 

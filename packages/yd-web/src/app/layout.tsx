@@ -7,6 +7,7 @@ import { cookieToInitialState } from "wagmi";
 import "@rainbow-me/rainbowkit/styles.css";
 import { getConfig } from "../wagmi";
 import { Providers } from "./providers";
+import { AlertProvider } from '@/contexts/AlertContext';
 // 使用系统默认字体
 export const metadata: Metadata = {
   title: "Web3 Course Platform",
@@ -27,7 +28,11 @@ export default function RootLayout(props: { children: ReactNode }) {
             '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
         }}
       >
-        <Providers initialState={initialState}>{props.children}</Providers>
+        <Providers initialState={initialState}>
+            <AlertProvider>  
+            {props.children} 
+          </AlertProvider> 
+        </Providers>
       </body>
     </html>
   );

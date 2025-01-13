@@ -1,3 +1,5 @@
+import { formatUnits, parseUnits } from 'viem';  
+
 export const shortenAddress = (address: string | undefined): string => {  
   if (!address) return "";  
   return `${address.slice(0, 6)}...${address.slice(-4)}`;  
@@ -58,4 +60,62 @@ export const formatNumber = (num: number) => {
   return Number(num.toFixed(6))  
     .toString()  
     .replace(/\.?0+$/, '');  
+};  
+
+export const formatTokenBalance = (value: number): string => {  
+  // 处理 0 或非数字情况  
+  if (!value || isNaN(value)) return '0';  
+  
+  // 如果数字小于 0.000001，显示最多 6 位小数  
+  if (value < 0.000001) {  
+    return value.toFixed(6);  
+  }  
+
+  // 否则使用 toLocaleString 并限制小数位数  
+  return value.toLocaleString('en-US', {  
+    minimumFractionDigits: 0,  
+    maximumFractionDigits: 4  
+  });  
+}; 
+
+export const formatTokenUnits = (  
+  amount: bigint | number | string,  
+  decimals: number = 18,  
+  displayDecimals: number = 2  
+): string => {  
+  try {  
+    // 去除末尾的0和小数点  
+    const removeTrailingZeros = (numStr: string): string => {  
+      return numStr.replace(/\.?0+$/, '');  
+    };  
+
+    // 如果输入已经是数字或字符串形式  
+    if (typeof amount === 'number' || typeof amount === 'string') {  
+      const number = Number(amount);  
+      
+      if (isNaN(number)) return '0';  
+      if (number === 0) return '0';  
+      
+      // 非常小的数字使用科学计数法  
+      if (number < 0.000001) {  
+        return number.toExponential(2);  
+      }  
+      
+      // 小于 1 的数字显示更多小数位  
+      if (number < 1) {  
+        return removeTrailingZeros(number.toFixed(6));  
+      }  
+      
+      // 正常显示固定小数位，去掉末尾的0  
+      return removeTrailingZeros(number.toFixed(displayDecimals));  
+    }  
+    
+    // 如果输入是 bigint，需要先格式化  
+    const formatted = formatUnits(amount, decimals);  
+    return formatTokenUnits(formatted, decimals, displayDecimals);  
+    
+  } catch (error) {  
+    console.error('Format token amount error:', error);  
+    return '0';  
+  }  
 };  
