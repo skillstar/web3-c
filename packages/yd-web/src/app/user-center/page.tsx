@@ -11,62 +11,88 @@ export default function UserCenterPage() {
   const [loading, setLoading] = useState(true);  
   const [error, setError] = useState<string | null>(null);  
 
+  // 模拟数据  
+  const mockData: UserData = {  
+    user: {  
+      username: "Unnamed",  
+      walletAddress: "0x123...ABC",  
+      joinedAt: "2025-01-10",  
+      totalLearningHours: 2773,  
+      totalPoints: 388,  
+      totalNFTs: 3,  
+      nftAvatar: "/default-avatar.png",  
+    },  
+    courses: [  
+      { courseId: 1, name: "React Fundamentals: From Beginner to Pro Development", progress: 30 },  
+      { courseId: 2, name: "Next.js 14 Comprehensive Guide，Full-Stack Web Development with Next.js", progress: 50 },  
+    ],  
+    nfts: [  
+      { nftId: 1, title: "web3 full-stack development certification #1", imageUrl: "/1.jpg", nftMintedTimestamp: "2025/1/12" },  
+      { nftId: 2, title: "React Frontend development certification #2", imageUrl: "/1.jpg", nftMintedTimestamp: "2025/6/2" },  
+    ],  
+    history: [  
+      {  
+        date: '2024-01-15',  
+        type: 'course-completed',  
+        courseTitle: 'React Fundamentals',  
+        miningReward: 2.5  
+      },  
+      {  
+        date: '2024-01-16',  
+        type: 'note-published',  
+        miningReward: 1.2  
+      },  
+      {  
+        date: '2024-01-17',  
+        type: 'quiz-passed',  
+        quizTitle: 'Next.js Advanced',  
+        miningReward: 1.8  
+      }  
+    ],  
+  };  
+
+  // 使用 useEffect 来设置数据  
   useEffect(() => {  
-    const fetchUserData = async () => {  
+    // 模拟API调用  
+    const fetchData = async () => {  
       try {  
         setLoading(true);  
-        setError(null);  
+        // 这里可以替换为实际的API调用  
+        // const response = await fetch('/api/user-data');  
+        // const data = await response.json();  
         
-        const response = await fetch("/api/user/profile", {  
-          cache: "no-store",  
-          headers: {  
-            "Content-Type": "application/json",  
-          },  
-        });  
-
-        if (!response.ok) {  
-          throw new Error(`HTTP error! status: ${response.status}`);  
-        }  
-
-        const data = await response.json();  
-        setUserData(data);  
+        // 使用模拟数据  
+        setUserData(mockData);  
+        setError(null);  
       } catch (err) {  
-        console.error("Failed to fetch user data:", err);  
-        setError("Failed to load user data. Please try again later.");  
+        setError(err instanceof Error ? err.message : 'An error occurred');  
       } finally {  
         setLoading(false);  
       }  
     };  
 
-    fetchUserData();  
-  }, []);  
+    fetchData();  
+  }, []); // 空依赖数组意味着这个效果只在组件挂载时运行一次  
 
+  // 加载状态  
   if (loading) {  
-    return (  
-      <div className="min-h-screen flex items-center justify-center bg-base-200">  
-        <div className="loading loading-spinner loading-lg"></div>  
-      </div>  
-    );  
+    return <div className="min-h-screen bg-black pt-20 flex items-center justify-center">  
+      <div className="text-white">Loading...</div>  
+    </div>;  
   }  
 
+  // 错误状态  
   if (error) {  
-    return (  
-      <div className="min-h-screen flex items-center justify-center bg-base-200">  
-        <div className="alert alert-error">  
-          <span>{error}</span>  
-          <button   
-            className="btn btn-sm btn-ghost"   
-            onClick={() => window.location.reload()}  
-          >  
-            Retry  
-          </button>  
-        </div>  
-      </div>  
-    );  
+    return <div className="min-h-screen bg-black pt-20 flex items-center justify-center">  
+      <div className="text-red-500">Error: {error}</div>  
+    </div>;  
   }  
 
+  // 如果没有数据  
   if (!userData) {  
-    return null;  
+    return <div className="min-h-screen bg-black pt-20 flex items-center justify-center">  
+      <div className="text-white">No data available</div>  
+    </div>;  
   }  
 
   return (  
@@ -78,9 +104,8 @@ export default function UserCenterPage() {
           <UserProfile user={userData.user} />  
         </div>  
         
-        <div className=" rounded-lg shadow-lg p-6">  
+        <div className="rounded-lg shadow-lg p-6">  
           <TabView  
-            courses={userData.courses}  
             nfts={userData.nfts}  
             history={userData.history}  
           />  

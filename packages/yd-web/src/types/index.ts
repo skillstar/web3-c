@@ -32,7 +32,7 @@ export interface User {
 // 课程信息  
 export interface Course {  
   courseId: number;  
-  title: string;  
+  name: string;  
   progress: number;  
 }  
 

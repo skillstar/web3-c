@@ -21,7 +21,7 @@ export interface CombinedCourse extends CourseTypeCard {
   description: string  
 }  
 
-const DEFAULT_IMAGES = [  
+export const DEFAULT_IMAGES = [  
   "https://i.seadn.io/gcs/files/6d5f2df1cb886b2b0cfb8231bcaceb75.jpg?auto=format&dpr=1&h=500&fr=1",  
   "https://i.seadn.io/s/raw/files/93365a2dd8e50ea072f0defa1295160d.jpg?auto=format&dpr=1&h=500&fr=1"  
 ]  

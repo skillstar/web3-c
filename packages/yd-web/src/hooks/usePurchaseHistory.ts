@@ -21,13 +21,25 @@ export interface PurchaseWithCourse extends Purchase {
   course: Course;  
 }  
 
+export interface CourseStats {  
+  totalCourses: number;  
+  purchasedCourses: number;  
+  allCourses: Course[];  
+}  
+
 export function usePurchaseHistory() {  
   const { address } = useAccount();  
   const publicClient = usePublicClient();  
   const [purchases, setPurchases] = useState<PurchaseWithCourse[]>([]);  
+  const [courseStats, setCourseStats] = useState<CourseStats>({  
+    totalCourses: 0,  
+    purchasedCourses: 0,  
+    allCourses: []  
+  });  
   const [isLoading, setIsLoading] = useState(false);  
   const [error, setError] = useState<string | null>(null);  
 
+  // 获取单个课程信息  
   const getCourseInfo = async (courseId: bigint): Promise<Course> => {  
     try {  
       const course = await publicClient.readContract({  
@@ -44,6 +56,41 @@ export function usePurchaseHistory() {
     }  
   };  
 
+  // 获取课程总数  
+  const getCourseCount = async (): Promise<number> => {  
+    try {  
+      const count = await publicClient.readContract({  
+        address: YDCOURSE_CONTRACT.address,  
+        abi: YDCOURSE_CONTRACT.abi,  
+        functionName: 'courseCount',  
+      }) as bigint;  
+
+      return Number(count);  
+    } catch (error) {  
+      console.error('Error fetching course count:', error);  
+      throw error;  
+    }  
+  };  
+
+  // 获取所有课程信息  
+  const getAllCourses = async () => {  
+    try {  
+      const courseCount = await getCourseCount();  
+      const courses: Course[] = [];  
+
+      for (let i = 1; i <= courseCount; i++) {  
+        const course = await getCourseInfo(BigInt(i));  
+        courses.push(course);  
+      }  
+
+      return courses;  
+    } catch (error) {  
+      console.error('Error fetching all courses:', error);  
+      throw error;  
+    }  
+  };  
+
+  // 获取购买历史  
   const fetchPurchaseHistory = async () => {  
     if (!address) return;  
 
@@ -51,6 +98,7 @@ export function usePurchaseHistory() {
     setError(null);  
 
     try {  
+      // 获取购买历史  
       const purchaseHistory = await publicClient.readContract({  
         address: YDCOURSE_CONTRACT.address,  
         abi: YDCOURSE_CONTRACT.abi,  
@@ -69,8 +117,19 @@ export function usePurchaseHistory() {
       );  
 
       setPurchases(purchasesWithCourses);  
+
+      // 获取课程统计信息  
+      const totalCourses = await getCourseCount();  
+      const allCourses = await getAllCourses();  
+
+      setCourseStats({  
+        totalCourses,  
+        purchasedCourses: purchasesWithCourses.length,  
+        allCourses  
+      });  
+
     } catch (error: any) {  
-      console.error('Error fetching purchase history:', error);  
+      console.error('Error fetching data:', error);  
       setError(error.message);  
     } finally {  
       setIsLoading(false);  
@@ -95,6 +154,11 @@ export function usePurchaseHistory() {
       fetchPurchaseHistory();  
     } else {  
       setPurchases([]);  
+      setCourseStats({  
+        totalCourses: 0,  
+        purchasedCourses: 0,  
+        allCourses: []  
+      });  
     }  
   }, [address]);  
 
@@ -104,6 +168,9 @@ export function usePurchaseHistory() {
     error,  
     fetchPurchaseHistory,  
     hasPurchased,  
-    getCourseInfo  
+    getCourseInfo,  
+    courseStats,  
+    getAllCourses,  
+    getCourseCount  
   };  
 }

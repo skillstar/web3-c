@@ -1,6 +1,7 @@
 'use client'  
 import { useState, useEffect } from "react"  
 import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi'  
+import { formatEther } from 'viem'  
 import { YDTOKEN_CONTRACT, YDCOURSE_CONTRACT } from '@/app/abi/contractConfig'  
 import { Button } from "@/app/components/ui/button"  
 import { cn } from "@/utils"  
@@ -125,7 +126,7 @@ export const ApproveButton = ({
               {ethPrice && (  
                 <div className="label">  
                   <span className="label-text-alt">  
-                    Rate: 1 YD = {formatNumber(ethPrice)} ETH  
+                    Rate: 1 YD = {formatEther(BigInt(ethPrice))} ETH  
                   </span>  
                 </div>  
               )}  
