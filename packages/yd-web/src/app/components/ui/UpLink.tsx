@@ -10,7 +10,7 @@ interface ContactButtonProps {
 
 const UpLink: React.FC<ContactButtonProps> = ({
   text = "Contact us",
-  href = "mailto:hello@nodes.ai",
+  href = "/contact",
   showArrow = true,
   className = "",
 }) => {

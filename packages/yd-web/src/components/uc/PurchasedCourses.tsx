@@ -2,6 +2,7 @@
 import { DEFAULT_IMAGES } from '@/hooks/useCourses';  
 import { PurchaseWithCourse } from '@/hooks/usePurchaseHistory';  
 import { useState, useEffect } from 'react'  
+import PurchasedCoursesSkeleton from './PurchasedCoursesSkeleton'
 import {  
   BookOpen,  
   Clock,  
@@ -118,13 +119,9 @@ export default function PurchasedCourses({
     setSelectedCourse(null);  
   }; 
 
-  if (isLoading) {  
-    return (  
-      <div className="flex justify-center items-center min-h-[200px]">  
-        <span className="loading loading-spinner loading-lg text-primary"></span>  
-      </div>  
-    );  
-  }  
+ if (isLoading) {  
+  return <PurchasedCoursesSkeleton />;  
+} 
 
   if (error) {  
     return (  

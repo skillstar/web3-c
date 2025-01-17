@@ -3,16 +3,18 @@ import { useState } from "react";
 import PurchasedCourses from "./PurchasedCourses";  
 import NFTCollection from "./NFTCollection";  
 import LearningHistory from "./LearningHistory";  
-import { NFT, HistoryRecord } from '@/types'  
+import { HistoryRecord } from '@/types'  
 import { usePurchaseHistory } from '@/hooks/usePurchaseHistory';  
+import { useAtom } from 'jotai'  
+import { userNFTCountAtom } from '@/atoms/nftAtoms' 
 
 type TabViewProps = {  
-  nfts: NFT[];  
   history: HistoryRecord[];  
 };  
 
-export default function TabView({ nfts, history }: TabViewProps) {  
+export default function TabView({ history }: TabViewProps) {  
   const [activeTab, setActiveTab] = useState<"courses" | "nfts" | "history">("courses");  
+  const [nftCount] = useAtom(userNFTCountAtom)
   
   const {  
     purchases,  
@@ -33,8 +35,8 @@ export default function TabView({ nfts, history }: TabViewProps) {
     },  
     {  
       key: "nfts" as const,  
-      label: `My Certificates(${nfts.length})`,  
-      content: <NFTCollection nfts={nfts} />  
+      label: `My Certificates(${nftCount})`,  
+      content: <NFTCollection />  
     },  
     {  
       key: "history" as const,  

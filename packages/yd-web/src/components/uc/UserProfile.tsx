@@ -2,7 +2,9 @@
 
 import { Settings, Wallet } from 'lucide-react';
 import EditableAvatar from './EditableAvatar'; 
-import { formatAddress } from '@/utils/shortenAddress'
+import { formatAddress } from '@/utils/shortenAddress' 
+import { useAtom } from 'jotai'  
+import { userNFTCountAtom } from '@/atoms/nftAtoms' 
 
 const EthereumIcon = () => (  
   <svg   
@@ -26,12 +28,15 @@ type UserProfileProps = {
     joinedAt: string;
     totalLearningHours: number;
     totalPoints: number;
-    totalNFTs: number;
   };
 };
 const address = '0xfdd46167C51062f2b1A8d713f0aac16746Ad4593'; 
 
 export default function UserProfile({ user }: UserProfileProps) {
+
+  const [nftCount] = useAtom(userNFTCountAtom)  
+
+
   const handleEditAvatar = () => {  
     // Avatar edit logic  
     console.log('Edit avatar');  
@@ -61,7 +66,7 @@ export default function UserProfile({ user }: UserProfileProps) {
           <p className="text-sm text-gray-600">Learning Hours</p>  
         </div>  
         <div className="text-center">  
-          <span className="text-lg font-bold block">{user.totalNFTs}</span>  
+          <span className="text-lg font-bold block">{nftCount}</span>  
           <p className="text-sm text-gray-600">Certificates</p>  
         </div>  
         <div className="text-center">  

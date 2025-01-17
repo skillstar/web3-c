@@ -34,10 +34,10 @@ const Header = () => {
             {/* Main Navigation */}
             <nav className="hidden md:block">
               <ul className="flex items-center space-x-8">
-                <li>
+                 <li>
                   <UpLink
-                    text="Marketplace"
-                    href="/marketplace"
+                    text="Home"
+                    href="/"
                     showArrow={false}
                   ></UpLink>
                 </li>
@@ -46,10 +46,10 @@ const Header = () => {
                   {/* 添加一个包装器 div */}
                   <div className="relative py-4">
                     <Link
-                      href="/learning"
+                      href="/marketplace"
                       className="flex items-center text-gray-300 hover:text-primary transition-colors"
                     >
-                      <span>Learning Center</span>
+                      <span>Marketplace</span>
                       <ArrowDown className="ml-2 transition-transform duration-300 group-hover:rotate-180" />
                     </Link>
                     {/* 添加一个不可见的连接区域 */}
@@ -60,8 +60,8 @@ const Header = () => {
                         <div className="px-4 py-2">
                           {/* 包装器div来控制padding */}
                           <UpLink
-                            text=" My Courses"
-                            href="/learning/my-courses"
+                            text="React Basics"
+                            href="/marketplace/react"
                             showArrow={false}
                             className="!text-sm" // 只覆盖文字大小
                           />
@@ -69,8 +69,17 @@ const Header = () => {
                         <div className="px-4 py-2">
                           {/* 包装器div来控制padding */}
                           <UpLink
-                            text="Learning Progress"
-                            href="/learning/progress"
+                            text="Smart Contract"
+                            href="/marketplace/react"
+                            showArrow={false}
+                            className="!text-sm" // 只覆盖文字大小
+                          />
+                        </div>
+                         <div className="px-4 py-2">
+                          {/* 包装器div来控制padding */}
+                          <UpLink
+                            text="DeFi & Web3"
+                            href="/marketplace/react"
                             showArrow={false}
                             className="!text-sm" // 只覆盖文字大小
                           />
@@ -78,6 +87,13 @@ const Header = () => {
                       </div>
                     </div>
                   </div>
+                </li>
+                <li>
+                  <UpLink
+                    text="Community"
+                    href="/community"
+                    showArrow={false}
+                  ></UpLink>
                 </li>
                 <li>
                   <UpLink showArrow={false}></UpLink>

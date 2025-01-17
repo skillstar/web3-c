@@ -1,8 +1,6 @@
 import YdTokenABI from './YdToken.json'
 import YdCourseABI from './YdCourse.json'
-import YdNFTABI from './CourseNFT.json'
-import CourseProgressABI from './CourseProgress.json'
-import CourseProgressAggregatorABI from './CourseProgressAggregator.json'
+import MiniNFTABI from './MiniNFT.json'
 
 
 //购买YD token
@@ -16,20 +14,10 @@ export const YDCOURSE_CONTRACT = {
     abi: YdCourseABI.abi
 } as const;
 
-//CourseProgressAggregator (进度追踪)  
-export const CPA_CONTRACT = {
-    address: "0x4F51626f276715b6c660C33B2552C47f1618b572",
-    abi: CourseProgressAggregatorABI.abi
-} as const;
-//CourseProgress (业务逻辑处理)
-export const CP_CONTRACT = {
-    address: "0xfdd46167C51062f2b1A8d713f0aac16746Ad4593",
-    abi: CourseProgressABI.abi
-} as const;
-//CourseNFT (NFT铸造) 
+//MiniNFT (NFT铸造) 
 export const NFT_CONTRACT = {
-    address: "0x7121f1DBB04b6C4694Dc9DFe770432847A06Bf3d",
-    abi: YdNFTABI.abi
+    address: "0xA5D8A90eC35da000Dd432CecE8D7F2CA14cEbb0f",
+    abi: MiniNFTABI.abi
 } as const; 
 
 // 检查类型是否生成  
